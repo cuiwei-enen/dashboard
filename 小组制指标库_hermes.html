@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>小组制指标库 - 2026年</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+h1 { color: #333; }
+h3 { color: #555; margin: 20px 0 10px 0; }
+.btn { 
+    display: inline-block; 
+    padding: 10px 20px; 
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    color: white; 
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    margin: 10px 5px;
+    font-size: 14px;
+}
+.btn:hover { opacity: 0.9; }
+.fold-btn { background: #6c757d; margin-bottom: 10px; }
+
+/* 标签页样式 */
+.tabs { 
+    display: flex; 
+    gap: 5px; 
+    margin-bottom: 20px;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 10px;
+}
+.tab-btn {
+    padding: 12px 24px;
+    background: #f5f5f5;
+    border: 2px solid #ddd;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.2s;
+    color: #666;
+}
+.tab-btn:first-child {
+    border-color: #4a90d9;
+}
+.tab-btn:last-child {
+    border-color: #5cb85c;
+}
+.tab-btn.active:first-child {
+    background: #4a90d9;
+    color: white;
+    border-color: #4a90d9;
+}
+.tab-btn.active:last-child {
+    background: #5cb85c;
+    color: white;
+    border-color: #5cb85c;
+}
+.tab-btn:hover:not(.active) {
+    background: #e8e8e8;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.table-container { 
+    overflow: auto; 
+    margin-top: 20px; 
+    background: white; 
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    height: calc(100vh - 250px);
+}
+table { 
+    border-collapse: collapse; 
+}
+th, td { 
+    border: 1px solid #ddd; 
+    padding: 8px; 
+    text-align: center; 
+    font-size: 12px;
+    white-space: nowrap;
+}
+td:nth-child(9), td:nth-child(10) {
+    max-width: 120px;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: #4a5568;
+    color: white;
+}
+th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 10; width: 50px; }
+th:nth-child(3), td:nth-child(3) { position: sticky; left: 50px; z-index: 10; width: 120px; white-space: normal; word-wrap: break-word; }
+th:nth-child(1), th:nth-child(3) { z-index: 30; white-space: nowrap; }
+
+td:nth-child(1), td:nth-child(3) {
+    background: white;
+}
+tr:nth-child(even) td:nth-child(1), 
+tr:nth-child(even) td:nth-child(3) {
+    background: #f9f9f9;
+}
+
+th { 
+    background: #4a5568; 
+    color: white;
+    font-weight: 500;
+}
+tr:hover { background-color: #e8f4f8; }
+.highlight { background-color: #fff3cd !important; }
+.empty { color: #ccc; font-style: italic; }
+.rate { color: #28a745; font-weight: bold; }
+.info { color: #666; margin: 10px 0; }
+
+/* 明细数据样式 */
+.detail-section {
+    margin-bottom: 30px;
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.detail-table-container {
+    overflow: auto;
+    max-height: 400px;
+}
+.detail-table {
+    width: 100%;
+    font-size: 11px;
+}
+.detail-table th {
+    background: #4a5568;
+    position: sticky;
+    top: 0;
+}
+.detail-table td {
+    padding: 6px;
+}
+.detail-table tr:nth-child(even) {
+    background: #f7fafc;
+}
+.detail-table tr:hover {
+    background: #edf2f7;
+}
+.download-detail-btn {
+    background: #48bb78;
+    margin-bottom: 10px;
+    padding: 8px 16px;
+    font-size: 13px;
+}
+</style>
+</head>
+<body>
+<h1>小组制指标库 - 2026年</h1>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('summary')">指标完成情况</button>
+    <button class="tab-btn" onclick="switchTab('detail')">明细数据</button>
+</div>
+
+<div id="tab-summary" class="tab-content active">
+    <p class="info">数据范围: 2026年1月 - 2026年12月 | 黄色高亮为当月已填充数据 | 绿色加粗为率类指标 | 可拖动滚动条查看完整数据</p>
+<button class="btn" onclick="showAnalytics()" style="background: #6c757d;">查看统计</button>
+<button class="btn" onclick="Analytics.exportStats()" style="background: #17a2b8;">导出统计</button>
+<button class="btn" onclick="downloadExcel()">下载指标完成情况</button>
+<button class="btn" onclick="toggleValidation()" style="background: #ffc107; color: #333;">校验结果</button>
+
+<div id="validation-panel" style="display: none; margin: 15px 0; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #ddd;">
+    <h3 style="margin-top: 0;">数据自检结果</h3>
+    <div id="validation-results">
+<p style="margin: 10px 0;"><strong>校验概要：</strong> ⚠️ 2条警告 | ❌ 0条错误</p>
+<p style="color: #ffc107; margin: 5px 0;">⚠️ 【工单结果】激活充保/出价: 8月值572.00 vs 近3月均值237.00，偏差141.4%</p>
+<p style="color: #ffc107; margin: 5px 0;">⚠️ 出价达成率-出价到位商品占比: 8月值25.18% vs 近3月均值16.52%，偏差52.4%</p>
+
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+    <thead>
+    <tr>
+<th>序号</th>
+<th>涉及环节</th>
+<th>考核指标</th>
+<th>数据来源</th>
+<th>状态</th>
+<th>系统上线</th>
+<th>上线前方案</th>
+<th>数据维度</th>
+<th>指标算法</th>
+<th>口径说明</th>
+<th>26年1月</th>
+<th>26年2月</th>
+<th>26年3月</th>
+<th>26年4月</th>
+<th>26年5月</th>
+<th>26年6月</th>
+<th>26年7月</th>
+<th>26年8月</th>
+<th>26年9月</th>
+<th>26年10月</th>
+<th>26年11月</th>
+<th>26年12月</th>
+</tr>
+</thead>
+<tbody>
+<tr data-has-data="false"><td>1</td><td>总奖金池</td><td>拍卖业务毛利</td><td>【财务】</td><td>已提供</td><td></td><td></td><td>明细数据</td><td>管报毛利+自营检测师成本-营销费用-补贴</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>2</td><td>总奖金池</td><td>非拍卖业务毛利</td><td>【财务】</td><td>已提供</td><td></td><td></td><td>明细数据</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>3</td><td>总奖金池</td><td>小组费用</td><td>【财务】</td><td>已提供</td><td></td><td></td><td>明细数据</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>4</td><td>总奖金池</td><td>中台分摊费用</td><td>【财务】</td><td>已提供</td><td></td><td></td><td>到部门的统计数据</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>5</td><td>总奖金池</td><td>后台分摊费用</td><td>【财务】</td><td>已提供</td><td></td><td></td><td>到部门的统计数据</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>6</td><td>经营分主池</td><td>大域净成交量</td><td>【BI】
+【区域中台】</td><td>已提供</td><td></td><td></td><td>订单明细</td><td>订单明细
+细分厂商车源、4S/车商车源、合伙人车源、机构车源
+机构：澳门；合伙人车源：集团类型=UGC；厂商车源：按中台新提供清单算；其它算4S/车商车源</td><td>大域参拍，本域+跨域买家，均按大域规则计算</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>7</td><td>经营分主池</td><td>小圈净成交量</td><td>【BI】
+【区域中台】</td><td>已提供</td><td></td><td></td><td>订单明细</td><td>订单明细
+细分厂商车源、4S/车商车源、合伙人车源、机构车源</td><td>小圈参拍，本域+跨域买家，均按小圈规则计算</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>8</td><td>检测费用项</td><td>大域参拍量</td><td>【BI】
+【区域中台】</td><td>已提供</td><td></td><td></td><td>商品明细</td><td>商品明细
+细分厂商车源、4S/车商车源、合伙人车源、机构车源</td><td>同一门店，商品去重</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>9</td><td>检测费用项</td><td>跨域赔付金额</td><td>【268V】</td><td>已提供</td><td></td><td></td><td>订单明细</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>10</td><td>卖家开发</td><td>厂商客户签约时间</td><td>【BI】
+【区域中台】</td><td>已提供</td><td></td><td></td><td>到4S门店</td><td></td><td>主机门店：以主机厂签约时间判断客户归属；门店签约时间早于首拍时间，计为主机客户；晚于首拍时间，计为区域4S客户
+主机线索：以各主机厂线索在此门店第一次参拍时间为准</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>11</td><td>卖家开发</td><td>厂商门店首次参拍时间</td><td>【BI】
+【区域中台】</td><td>已提供</td><td></td><td></td><td>到4S门店</td><td></td><td>首次参拍6个月内为首签分红；6个月以后为续约分红
+在商品明细中增加门店首次参拍时间字段</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>12</td><td>卖家开发</td><td>4S店/车商客户签约时间</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>订单明细</td><td></td><td>替换为“首次参拍时间”
+签约和首拍时间间隔很短，基本在同一个月；且签约时间无系统记录</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>13</td><td>卖家开发</td><td>机构客户开发-签约时间</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>订单明细</td><td></td><td>替换为“首次参拍时间”
+签约时间因客户差异，与首拍间隔很长，开发人员也不可控</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>14</td><td>卖家开发</td><td>合伙人开发-签约时间</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>订单明细</td><td></td><td>替换为“首次参拍时间”
+签约和首拍时间间隔很短，基本在同一个月；且签约时间无系统记录</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>15</td><td>买家开发</td><td>客户注册量-非平台线索转化</td><td>【交易中台】
+【产研】</td><td>待系统上线</td><td>预计10月下旬</td><td>系统上线前，由交易中台提供注册台账</td><td>明细数据</td><td></td><td>系统上线前，以运营台账为准</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>16</td><td>买家开发</td><td>稀缺买家</td><td>【交易中台】</td><td>取消该指标</td><td></td><td></td><td></td><td></td><td>暂时不要此指标，不做稀缺和正常买家区分</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>17</td><td>买家开发</td><td>营销页推广浏览UV排名（一次+二次）</td><td>【交易中台】
+【产研】</td><td>待系统上线</td><td>预计11月下旬</td><td>系统上线前，暂不计算</td><td>到员工的统计数据</td><td></td><td>预计11月下旬产品上线</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>18</td><td>买家开发</td><td>OFC首开奖励分</td><td>【交易中台】
+【产研】</td><td>待系统上线</td><td>预计10月下旬</td><td>系统上线前，暂不计算</td><td>明细数据</td><td></td><td>预计10月下旬产品上线</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>19</td><td>买家开发</td><td>买家画像/维护</td><td>【交易中台】
+【产研】</td><td>待系统上线</td><td>预计11月底</td><td>系统上线前，暂不计算</td><td>到员工的统计数据</td><td></td><td>预计11月底产品上线，产品未上线不考核此指标</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>20</td><td>买家开发</td><td>30天内充保转化率</td><td>【交易中台】
+【产研】</td><td>待系统上线</td><td>预计10月下旬</td><td>系统上线前，由交易中台提供注册台账，BI按台账提供数据</td><td>到员工的统计数据</td><td>该员工充保转化率/所有新用户的充保转化率</td><td>调为20天内充保转换率——当月注册在次月20日前的充保转化率</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>21</td><td>买家开发</td><td>新买家成交</td><td>【交易中台】
+【产研】</td><td>待系统上线</td><td>预计10月下旬</td><td>系统上线前，由交易中台提供注册台账，BI按台账提供数据</td><td>明细数据</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>22</td><td>区域中台</td><td>区域团队人均产投比</td><td>【财务】</td><td>已提供</td><td></td><td></td><td>到部门的统计数据</td><td>区域团队总体人均产投比/人均产投比最高值（区域团队）</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>23</td><td>买家子池</td><td>工单-按时/逾期</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>到员工的统计数据</td><td></td><td>暂时不区分逾期数据，待系统调整逾期判断规则后再取</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>24</td><td>买家子池</td><td>AI执行的工单占比</td><td>【交易中台】
+【产研】</td><td>待系统上线</td><td>预计10月底</td><td>系统上线前，系数按1算</td><td>平台整体数据</td><td>AI执行的工单占比-20%+1</td><td>预计10月底产品上线，前期默认为1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>25</td><td>买家子池</td><td>AI执行的工单转化率</td><td>【交易中台】
+【产研】</td><td>待系统上线</td><td>预计10月底</td><td>系统上线前，系数按1算</td><td>平台整体数据</td><td>当月转化率/之前三个月转化率均值的二次方</td><td>预计10月底产品上线，前期默认为1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>26</td><td>买家子池</td><td>广告投放-成功开发新渠道</td><td>【交易中台】</td><td>取消该指标</td><td></td><td></td><td></td><td></td><td>暂时没有投放，目前不考核；</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>27</td><td>买家子池</td><td>新注册用户数</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>去掉大风车</td><td>1532</td><td>869</td><td>2252</td><td>2423</td><td>1779</td><td>1582</td><td>1313</td><td class="highlight">1201</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>28</td><td>买家子池</td><td>注册到充保转化率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>注册去掉大风车，充保是平台首充</td><td class="rate">16.91%</td><td class="rate">14.38%</td><td class="rate">18.83%</td><td class="rate">10.81%</td><td class="rate">12.82%</td><td class="rate">12.26%</td><td class="rate">11.35%</td><td class="highlight rate">18.07%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>29</td><td>买家子池</td><td>充保到首提转化率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>平台首充、跨域首提</td><td class="rate">36.29%</td><td class="rate">36.80%</td><td class="rate">31.60%</td><td class="rate">41.60%</td><td class="rate">39.91%</td><td class="rate">41.75%</td><td class="rate">44.97%</td><td class="highlight rate">37.33%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>30</td><td>买家子池</td><td>首提-复提转化率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>仅看跨域
+复提：当月二提车商</td><td class="rate">54.26%</td><td class="rate">47.83%</td><td class="rate">44.78%</td><td class="rate">53.21%</td><td class="rate">51.65%</td><td class="rate">64.20%</td><td class="rate">59.70%</td><td class="highlight rate">56.79%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>31</td><td>买家子池</td><td>用户流失率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>之前三个月均值/当月达到值</td><td>已流失车商：以月末最后一天为准，近60天无出价无登录的，60天-240天内，历史跨域成交量≥1的车商
+已流失车商/历史有成交的车商数</td><td class="rate">9.74%</td><td class="rate">10.21%</td><td class="rate">10.88%</td><td class="rate">10.50%</td><td class="rate">11.60%</td><td class="rate">11.98%</td><td class="rate">12.85%</td><td class="highlight rate">12.98%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>32</td><td>买家子池</td><td>用户出价活跃度（暂时不用）</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>出价流入：上一个周期无出价，本周期有出价
+出价流出：上一个周期有出价，本周期无出价
+流出/流入</td><td class="rate">131.00%</td><td class="rate">341.84%</td><td class="rate">26.29%</td><td class="rate">144.74%</td><td class="rate">175.73%</td><td class="rate">119.97%</td><td></td><td class="highlight rate">77.61%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>33</td><td>买家子池</td><td>用户画像完成度</td><td>【交易中台】
+【产研】</td><td>待系统上线</td><td>预计11月初</td><td>系统上线前，暂不计算</td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>预计11月初产品上线，产品未上线不考核此指标</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>34</td><td>买家子池</td><td>【工单结果】首次充保</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>到员工的统计数据</td><td></td><td>平台首充车商数</td><td>259</td><td>125</td><td>424</td><td>262</td><td>228</td><td>194</td><td>149</td><td class="highlight">217</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>35</td><td>买家子池</td><td>【工单结果】首次成交</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>到员工的统计数据</td><td></td><td>跨域首提车商数</td><td>94</td><td>46</td><td>134</td><td>109</td><td>91</td><td>81</td><td>67</td><td class="highlight">81</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>36</td><td>买家子池</td><td>完成复提</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>到员工的统计数据</td><td></td><td>跨域二提车商数
+复提：当月二提车商</td><td>51</td><td>22</td><td>60</td><td>58</td><td>47</td><td>52</td><td>40</td><td class="highlight">46</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td></td><td></td><td>【工单结果】邀请注册车商数</td><td></td><td></td><td></td><td>20250319-NEW</td><td></td><td></td><td>通过以下方式带来的注册车商数，具体到人：
+1、扫描邀请码拉来的新注册
+2、用户被录入买家运营工作台线索池，线索注册时与其绑定
+3、通过分享车源带来的注册车商数
+PS：如同一车商既在分享/邀请码注册，也在线索池内，优先记在分享/邀请码注册
+（新口径2025年5月开始执行）
+———————口径调整⬆️———————
+旧口径：通过邀请码注册的车商数，具体到人</td><td>176</td><td>128</td><td>301</td><td>323</td><td>220</td><td>175</td><td>168</td><td class="highlight">94</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td></td><td></td><td>【工单结果】恢复出价</td><td></td><td></td><td></td><td>20250319-NEW</td><td></td><td></td><td>工单二级类型：出价。工单三级类型：出价高频、出价中频、出价低频；
+触发工单对应的车商在工单完成后跨域首次出价时间在首次工单完成日期至T+20日之内，该次出价所在月份视为恢复出价月份；统计各月份各工单处理人对应的恢复出价的车商数据
+3.28日修改口径：
+高、中、低频正常完成的工单，在跟进后5（高频类型）/10（中频类型）/20（低频类型）天激活买家出价，如低频 1号完成工单10条，只要在21号前回平台出价即可； 到个人，工单的最后处理人</td><td>363</td><td>373</td><td>402</td><td>387</td><td>502</td><td>360</td><td>319</td><td class="highlight">298</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td></td><td></td><td>【工单结果】恢复成交</td><td></td><td></td><td></td><td>20250319-NEW-暂无不考核结果</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td></td><td></td><td>【工单结果】激活充保</td><td></td><td></td><td></td><td>20250319-NEW</td><td></td><td></td><td>完成退保后工单，在跟进后20天激活买家再次充保，且在核算单位内当前保证金还有保计入。
+工单二级类型：退保，三级类型=无保证金余额。工单完成后20天内对应的用户完成平台充保，且统计期末平台保证金余额>=2000元
+按照转化动作首次的时间，作为统计月份</td><td>60</td><td>36</td><td>76</td><td>39</td><td>39</td><td>40</td><td>27</td><td class="highlight">39</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td></td><td></td><td>【工单结果】激活充保/出价</td><td></td><td></td><td></td><td>20250319-NEW</td><td></td><td></td><td>完成出价流失-60天无登录且无出价、或完成批量下发-流失激活召回工单类型，只要在跟进后20天产生充保或出价即可得结果分；其中
+无保商户激活结果-充保(且在核算单位内保证金还会有)，有保商户激活结果-出价，
+工单二级类型：线上批量跟进，三级类型=远程流失激活召回；工单二级类型：出价，三级类型=出价流失，如果对应买家在工单完成T-1天平台保证金余额<2000，判定工单完成后20天内完成平台充保，且统计期末平台保证金余额>=2000; 如果对应买家在工单完成T-1平台保证金余额>=2000，判定工单完成后20天内完成跨域出价且统计期末平台保证金余额>=2000
+按照转化动作首次的时间，作为统计月份</td><td>150</td><td>63</td><td>286</td><td>130</td><td>166</td><td>232</td><td>313</td><td class="highlight">572</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td></td><td></td><td>微信推送浏览</td><td>【BI】</td><td></td><td></td><td></td><td></td><td>JCYP_APP_CARDETAIL、CYP_H5_CARDETAILS_OPENAPP   分享人姓名、分享人编号、被浏览用户数量、按日去重，月加和</td><td>分享人分享车源，带来的浏览车商数，买家编号单日去重，单月累加计算</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td></td><td></td><td>存量公海池转化------在明细里面更新结果</td><td>【BI】</td><td></td><td></td><td></td><td>到员工的统计数据</td><td></td><td>【激活充保&出价】存量用户公海池领取用户并在领取后20天激活充保或出价
+1、领取类型=主动认领；统计期按领取时间统计；领取人按照创建人
+2、存量用户公海池领取判断：买家跨域首提时间在领取时间之前
+3、若对应买家在被领取之前超过60天无登录，则考核1⃣️领取买家后10天内买家是否有登录行为，且统计期末维护人=领取人；2⃣️领取时刻起买家后20天内是否有充值，且统计期末平台保证金余额>=2000，且统计期末维护人=领取人；3⃣️领取买家后30天内完成跨域成交，且统计期末维护人=领取人。
+4、若对应买家在被领取之前60天内有登录，且领取前一天平台保证金<2000，则考核1️⃣领取（领取时刻）买家后20天内是否有充值，且统计期末平台保证金余额>=2000，且统计期末维护人=领取人；2️⃣领取买家后30天内完成跨域成交，且统计期末维护人=领取人。
+5、若对应买家在领取之前60天内有登录，且领取当天平台保证金>=2000，则判断领取买家后30天内完成跨域成交，且统计期末维护人=领取人。</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>38</td><td>交易撮合</td><td>拍次成交率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>竞拍单成交率（跨域，不减退车）</td><td class="rate">12.99%</td><td class="rate">12.88%</td><td class="rate">13.33%</td><td class="rate">9.21%</td><td class="rate">8.21%</td><td class="rate">7.88%</td><td class="rate">9.09%</td><td class="highlight rate">11.23%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>39</td><td>交易撮合</td><td>车辆成交率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>跨域成交率</td><td class="rate">20.69%</td><td class="rate">18.87%</td><td class="rate">21.47%</td><td class="rate">15.66%</td><td class="rate">14.13%</td><td class="rate">13.29%</td><td class="rate">14.67%</td><td class="highlight rate">17.90%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>40</td><td>交易撮合</td><td>保留价合理率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>平台整体，同之前考核，按业务提供区分区域和分段逻辑</td><td class="rate">51.15%</td><td class="rate">51.70%</td><td class="rate">48.40%</td><td class="rate">50.16%</td><td class="rate">69.37%</td><td class="rate">65.69%</td><td class="rate">59.32%</td><td class="highlight rate">57.67%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>41</td><td>交易撮合</td><td>跨域属实争议率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>之前三个月均值/当月达到值</td><td>平台整体，不含无赔付</td><td class="rate">6.14%</td><td class="rate">6.03%</td><td class="rate">5.85%</td><td class="rate">6.61%</td><td class="rate">6.59%</td><td class="rate">7.28%</td><td class="rate">6.74%</td><td class="highlight rate">6.15%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>42</td><td>交易撮合</td><td>检测及时率系数</td><td>【交易中台】
+【产研】</td><td>待系统上线</td><td>预计25.1月</td><td>系统上线前，系数按1算</td><td>平台整体数据</td><td>之前三个月均值/当月达到值</td><td>待流程梳理+系统开发</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>43</td><td>交易撮合</td><td>商品曝光率增长系数-UV>30商品占比</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>大域，浏览车商数>30的商品占比</td><td class="rate">65.59%</td><td class="rate">57.99%</td><td class="rate">66.95%</td><td class="rate">55.98%</td><td class="rate">48.32%</td><td class="rate">46.41%</td><td class="rate">49.94%</td><td class="highlight rate">57.22%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>44</td><td>交易撮合</td><td>商品曝光率增长系数-UV<5商品占比</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>之前三个月均值/当月达到值</td><td>大域</td><td class="rate">1.74%</td><td class="rate">2.36%</td><td class="rate">1.98%</td><td class="rate">3.65%</td><td class="rate">2.95%</td><td class="rate">2.74%</td><td class="rate">3.56%</td><td class="highlight rate">3.45%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>45</td><td>交易撮合</td><td>商品曝光率增长系数-单商品UV值</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>大域单商品浏览车商数</td><td>56.34</td><td>48.83</td><td>58.50</td><td>44.57</td><td>38.40</td><td>37.28</td><td>40.43</td><td class="highlight">46.34</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>46</td><td>交易撮合</td><td>交易引擎提升率-top20浏览率（暂时不用）</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>有推送任务的日期中，车商浏览的商品中，TOP20的商品占比，人+商品+天粒度统计，按月计算</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>47</td><td>交易撮合</td><td>出价达成率-最高价/保留价</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>大域，去掉无保留价</td><td class="rate">63.91%</td><td class="rate">60.28%</td><td class="rate">65.02%</td><td class="rate">57.95%</td><td class="rate">55.49%</td><td class="rate">53.21%</td><td class="rate">54.45%</td><td class="highlight rate">57.24%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>48</td><td>交易撮合</td><td>出价达成率-出价到位商品占比</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>大域</td><td class="rate">28.09%</td><td class="rate">27.39%</td><td class="rate">31.07%</td><td class="rate">19.25%</td><td class="rate">13.03%</td><td class="rate">16.01%</td><td class="rate">20.52%</td><td class="highlight rate">25.18%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>49</td><td>交易撮合</td><td>出价达成率-单商品出价车商数</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>大域</td><td>3.20</td><td>2.80</td><td>3.41</td><td>2.47</td><td>2.13</td><td>2.03</td><td>2.29</td><td class="highlight">2.67</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>50</td><td>交易撮合</td><td>浏览-关注转化率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>跨域，去掉风车端的买家数转化率</td><td class="rate">39.51%</td><td class="rate">39.16%</td><td class="rate">38.30%</td><td class="rate">36.99%</td><td class="rate">36.84%</td><td class="rate">37.78%</td><td class="rate">38.06%</td><td class="highlight rate">40.33%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>51</td><td>交易撮合</td><td>关注-出价转化率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>跨域，去掉风车端的买家数转化率</td><td class="rate">61.10%</td><td class="rate">56.27%</td><td class="rate">61.78%</td><td class="rate">60.91%</td><td class="rate">59.33%</td><td class="rate">59.79%</td><td class="rate">60.10%</td><td class="highlight rate">61.45%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>52</td><td>交易撮合</td><td>出价-成交转化率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>跨域，去掉风车端的买家数转化率</td><td class="rate">31.14%</td><td class="rate">26.77%</td><td class="rate">30.09%</td><td class="rate">30.44%</td><td class="rate">33.07%</td><td class="rate">31.43%</td><td class="rate">31.52%</td><td class="highlight rate">32.60%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>53</td><td>交易撮合</td><td>买家补贴效率</td><td>【财务】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>买家补贴额/毛利额
+之前三个月均值/当月达到值</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>54</td><td>交易撮合</td><td>主动收购/被动收购毛利</td><td>【财务】</td><td>已提供</td><td></td><td></td><td>明细数据</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>55</td><td>交易撮合</td><td>拍后撮合订单</td><td>【客服】</td><td>已提供</td><td></td><td></td><td>明细数据</td><td></td><td>以台账数据为准</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>56</td><td>客户服务</td><td>客诉完结单均时长</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>之前三个月均值/当月达到值</td><td>手动创建客诉工单时间到工单完结时间，跨月未完成，按完成时间归属对应月份，250331确定该指标不再使用</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>57</td><td>客户服务</td><td>投诉率</td><td>【BI】</td><td>待确认口径</td><td></td><td></td><td>平台整体数据</td><td>之前三个月均值/当月达到值</td><td>只看跨域：投诉工单+差评+吐槽
+投诉类型众多，无法由客服控制，待讨论</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>58</td><td>客户服务</td><td>客诉24小时完结率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>当月达到值/之前三个月均值</td><td>手动创建客诉工单时间到工单完结时间，跨月未完成，按完成时间归属对应月份；该时间在24小时内占整体的比例，250331确定该指标不再使用</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td></td><td>客户服务</td><td>升级客诉工单4小时完结率</td><td>【BI】</td><td></td><td></td><td></td><td></td><td></td><td>手动创建客诉工单，工单一级类型为【客服组-投诉处理】，二级类型为【升级投诉】对应的工单创建时间到工单完结时间，跨月未完成，按完成时间归属对应月份；该时间在4小时内占整体的比例。（20250331-纳入小组制考核范围，替换【客诉完结单均时长】）</td><td class="rate">66.67%</td><td class="rate">100.00%</td><td class="rate">100.00%</td><td class="rate">100.00%</td><td class="rate">100.00%</td><td class="rate">100.00%</td><td class="rate">100.00%</td><td class="highlight rate">100.00%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td></td><td>客户服务</td><td>订单差评准时完结率</td><td>【BI】</td><td></td><td></td><td></td><td></td><td></td><td>建议标签为“订单差评
+”的用户反馈中，按规定时间处理完成的反馈单量/总完成单量。按状态=”已处理“，最后干预所在月进行统计，规定时间标准：正常反馈：处理时长为1个小时；升级反馈：处理时长为2小时。每日9点-18：00产生的反馈，当天在规定时间范围内完成。18点-次日9点前产生的反馈，按9点产生的计算。如果18点后产生的工单在当日处理完成，需要参照标准时间。升级的标识：最后处理意见中前6个字含有“升级”描述
+。（20250331-纳入小组制考核范围，替换【客诉24小时完结率】）</td><td class="rate">69.44%</td><td class="rate">88.89%</td><td class="rate">84.62%</td><td class="rate">67.35%</td><td class="rate">78.95%</td><td class="rate">72.41%</td><td class="rate">78.38%</td><td class="highlight rate">69.70%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>59</td><td>争议处理</td><td>单均超标赔付</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>之前三个月均值/当月达到值</td><td>按订单算，如果一个订单有多个争议单，则合并计算
+超标赔付金额=实际赔付金额-建议赔付金额>0
+单均超标赔付金额=超标赔付金额总额/超标赔付订单量</td><td>1306.19</td><td>828.57</td><td>486</td><td>472.65</td><td>438.89</td><td>323.08</td><td>806.25</td><td class="highlight">556.25</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>60</td><td>争议处理</td><td>争议处理单均时长（小时）</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>之前三个月均值/当月达到值</td><td>只看跨域：争议单创建——处理结果创建（该节点未包含付款环节）
+流程：服务顾问和客户沟通-创建处理结果-买家确认-财务付款；其中买家确认节点时效无法控制；财务付款不成功目前无反馈</td><td>12.95</td><td>18.01</td><td>12.53</td><td>20.11</td><td>21.44</td><td>17.56</td><td>20.93</td><td class="highlight">16.87</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>61</td><td>交付服务</td><td>订单过户完成单均时长（小时）</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>之前三个月均值/当月达到值</td><td>只看跨域-工作日
+履约单创建——交接完成；不含弹个车、机构、自办过户</td><td>285.44</td><td>722.41</td><td>264.29</td><td>265.31</td><td>185.39</td><td>336.69</td><td>388.54</td><td class="highlight">258.17</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>62</td><td>交付服务</td><td>订单过户时长超时率</td><td>【BI】</td><td>已提供</td><td></td><td></td><td>平台整体数据</td><td>之前三个月均值/当月达到值</td><td>不同过户类型的交付时长标准
+履约单创建——交接完成；不含弹个车、机构、自办过户</td><td class="rate">45.65%</td><td class="rate">49.82%</td><td class="rate">37.61%</td><td class="rate">39.54%</td><td class="rate">37.30%</td><td class="rate">36.99%</td><td class="rate">43.75%</td><td class="highlight rate">39.70%</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td>63</td><td>交付服务</td><td>订单交付完成单均时长（小时）</td><td>【BI】</td><td>待提供</td><td></td><td></td><td>平台整体数据</td><td>之前三个月均值/当月达到值</td><td>只看跨域-自然日
+履约单创建——验车完成；不含弹个车、机构</td><td>68.93</td><td>55.02</td><td>57.83</td><td>68.16</td><td>66.95</td><td>68.06</td><td>69.52</td><td class="highlight">65.05</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="false"><td>64</td><td>机构子池</td><td>新客户激励</td><td>【BI】
+【机构】</td><td>已提供</td><td></td><td></td><td>明细数据</td><td></td><td>参照机构客户开发规则，以门店首拍时间为准</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+<tr data-has-data="true"><td></td><td></td><td>跨域净成交量</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>2487</td><td>1291</td><td>2822</td><td>2267</td><td>2073</td><td>1927</td><td>1784</td><td class="highlight">2062</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td><td class="empty">待填充</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="tab-detail" class="tab-content">
+    <p class="info">以下为各指标的明细数据</p>
+    <div class="detail-section"><h3>1. 微信分享浏览人数 (66条记录，浏览用户数合计：510)</h3><button class="btn download-detail-btn" onclick="downloadDetail('微信分享浏览人数')">下载此明细</button><div class="detail-table-container"><table class="detail-table" id="detail-微信分享浏览人数"><thead><tr><th>分享月份</th><th>分享人姓名</th><th>分享人编号</th><th>分享人员工编号</th><th>分享人部门</th><th>分享人状态(0:在职，1:离职，2:冻结)</th><th>浏览的用户数</th></tr></thead><tbody><tr><td>2026-08</td><td></td><td>MJZSQK02608220001</td><td></td><td></td><td></td><td>2</td></tr><tr><td>2026-08</td><td></td><td>U191023300126</td><td></td><td></td><td></td><td>2</td></tr><tr><td>2026-08</td><td></td><td>US001170</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>US274617</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td>侯浩浩</td><td>MJRZTF02505090001</td><td>DSC013575</td><td>二手车生态事业群-张功伟分管-拍卖业务运营中心-区域运营部-运营三区-山东二组</td><td>0</td><td>0</td></tr><tr><td>2026-08</td><td>王保全</td><td>US004713</td><td>DSC003235</td><td>二手车生态事业群-张功伟分管-拍卖业务运营中心-交易运营部-平台运营部</td><td>0</td><td>1</td></tr><tr><td>2026-08</td><td></td><td>U190113700040</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>U191108300150</td><td></td><td></td><td></td><td>6</td></tr><tr><td>2026-08</td><td></td><td>US287916</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td>于建业</td><td>U190704700047</td><td>DSC010496</td><td>二手车生态事业群-张功伟分管-拍卖业务运营中心-区域运营部-运营四区-河北组</td><td>0</td><td>4</td></tr><tr><td>2026-08</td><td></td><td>MJODBS02008060001</td><td></td><td></td><td></td><td>2</td></tr><tr><td>2026-08</td><td></td><td>U190816500029</td><td></td><td></td><td></td><td>2</td></tr><tr><td>2026-08</td><td></td><td>US212642</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td>姜浩</td><td>U190326600033</td><td>DSC003645</td><td>二手车生态事业群-张功伟分管-拍卖业务运营中心-区域运营部-运营三区-陕晋组</td><td>0</td><td>0</td></tr><tr><td>2026-08</td><td></td><td>MJJOUZ02502240001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJPYUQ02607160001</td><td></td><td></td><td></td><td>11</td></tr><tr><td>2026-08</td><td></td><td>MJTUIB02305280001</td><td></td><td></td><td></td><td>2</td></tr><tr><td>2026-08</td><td></td><td>MJWOML02305110001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>U190410600011</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td>敖钰皓</td><td>MJQZUZ02203260001</td><td>DSC010710</td><td>二手车生态事业群-张功伟分管-拍卖业务运营中心-区域运营部-运营四区-南方六省组</td><td>0</td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJBQRG02608060001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJCJQW02512210001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJGHVS02104130001</td><td></td><td></td><td></td><td>2</td></tr><tr><td>2026-08</td><td></td><td>MJIXGB02503300001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJUZXW02411140001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJERKN02608050001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>SH106456</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>US236633</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJLEEU02103010001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJYEPQ02208150001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>U190816600013</td><td></td><td></td><td></td><td>13</td></tr><tr><td>2026-08</td><td></td><td>U191202300005</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td>张路生</td><td>MJALOG02206290001</td><td>DSC007601</td><td>交付服务事业部-车务综合服务部-线下服务组</td><td>1</td><td>1</td></tr><tr><td>2026-08</td><td>郑文莉</td><td>MJUDGP02405210001</td><td>DSC012623</td><td>二手车生态事业群-张功伟分管-拍卖业务运营中心-交易运营部-买家发展运营部-电销组</td><td>0</td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJTHYQ02509160001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>U191020700037</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJCSIG02405130001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJOZTV02302280001</td><td></td><td></td><td></td><td>2</td></tr><tr><td>2026-08</td><td></td><td>MJPKBX02411060001</td><td></td><td></td><td></td><td>3</td></tr><tr><td>2026-08</td><td></td><td>MJSXXL02309260001</td><td></td><td></td><td></td><td>3</td></tr><tr><td>2026-08</td><td></td><td>MJTSTN02202160001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td>谢双双</td><td>MJGUNH02206080001</td><td>DSC010265</td><td>二手车生态事业群-张功伟分管-拍卖业务运营中心-交易运营部-买家发展运营部-电销组</td><td>0</td><td>0</td></tr><tr><td>2026-08</td><td></td><td>MJAWEU02201140001</td><td></td><td></td><td></td><td>2</td></tr><tr><td>2026-08</td><td></td><td>MJLXKK02304130001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJYGSI02305290001</td><td></td><td></td><td></td><td>0</td></tr><tr><td>2026-08</td><td></td><td>SH006883</td><td></td><td></td><td></td><td>2</td></tr><tr><td>2026-08</td><td></td><td>US273355</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>SH011361</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>SH060376</td><td></td><td></td><td></td><td>3</td></tr><tr><td>2026-08</td><td></td><td>U200413500028</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>US005809</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>lTOyroIiD5</td><td></td><td></td><td></td><td>0</td></tr><tr><td>2026-08</td><td>赖佳晨</td><td>MJSWHF02009100001</td><td>DSC008347</td><td>二手车生态事业群-张功伟分管-拍卖业务运营中心-区域运营部-运营二区-浙江一组</td><td>0</td><td>18</td></tr><tr><td>2026-08</td><td>陈娟</td><td>MJJHUE02209260001</td><td>DSC010455</td><td>二手车生态事业群-张功伟分管-拍卖业务运营中心-交易运营部-买家发展运营部-电销组</td><td>0</td><td>3</td></tr><tr><td>2026-08</td><td></td><td>MJJUIZ02501010001</td><td></td><td></td><td></td><td>2</td></tr><tr><td>2026-08</td><td></td><td>MJTCAN02304140001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td>张秀康</td><td>U190610300074</td><td>DSC011065</td><td>二手车生态事业群-张功伟分管-拍卖业务运营中心-区域运营部-运营三区-山东一组</td><td>0</td><td>0</td></tr><tr><td>2026-08</td><td></td><td>MJCSWB02605210001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>MJFFTH02301060001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td>杨兴红</td><td>MJLMRS02210250001</td><td>DSC010490</td><td>二手车生态事业群-张功伟分管-拍卖业务运营中心-交易运营部-买家发展运营部-电销组</td><td>0</td><td>9</td></tr><tr><td>2026-08</td><td></td><td>MJNPGQ02303290001</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>SH005768</td><td></td><td></td><td></td><td>6</td></tr><tr><td>2026-08</td><td></td><td>SH041373</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>SH093780</td><td></td><td></td><td></td><td>1</td></tr><tr><td>2026-08</td><td></td><td>US143549</td><td></td><td></td><td></td><td>8</td></tr><tr><td>2026-08</td><td></td><td>undefined</td><td></td><td></td><td></td><td>366</td></tr></tbody></table></div></div><div class="detail-section"><h3>2. 平台首次充保 (21条记录，平台首次充保人数：149)</h3><button class="btn download-detail-btn" onclick="downloadDetail('平台首次充保')">下载此明细</button><div class="detail-table-container"><table class="detail-table" id="detail-平台首次充保"><thead><tr><th>分类</th><th>月份</th><th>维护人编号</th><th>维护人姓名</th><th>车商数</th></tr></thead><tbody><tr><td>平台首次充保</td><td>2026-08</td><td>2zABguPnlf</td><td>冯泽岗</td><td>2</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>Eb8UUviBDR</td><td>柳长友</td><td>2</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>AuqO282Vnt</td><td>娄鹏程</td><td>20</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>OwOcygc8sc</td><td>刘丹丹</td><td>33</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>C88UME6FZt</td><td>谷建营</td><td>2</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>3ZuCZiPKCk</td><td>姜浩</td><td>4</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>5872206</td><td>郑燕玲</td><td>1</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>KSuyFveiqt</td><td>谢双双</td><td>37</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>VRqa2ePSt6</td><td>陈娟</td><td>52</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>TLgVuiGFyt</td><td>于建业</td><td>2</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td></td><td></td><td>1</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>lJu2jcCme4</td><td>郑文莉</td><td>14</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>JAOUouYAPd</td><td>林天</td><td>4</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>mkc3OG5AIp</td><td>张秀康</td><td>1</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>prQlGOr7Rn</td><td>张天恩</td><td>1</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>2YOMikbtQJ</td><td>史文轩</td><td>2</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>FheWx3MZdc</td><td>刘连</td><td>1</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>QCualwzeAr</td><td>杨兴红</td><td>33</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>YYQLTvm3YV</td><td>张晓飞</td><td>1</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>xkaSiLzMgB</td><td>侯浩浩</td><td>2</td></tr><tr><td>平台首次充保</td><td>2026-08</td><td>t3Ky6nZz63</td><td>于烨</td><td>2</td></tr></tbody></table></div></div><div class="detail-section"><h3>3. 恢复出价 (26条记录，恢复出价车商数：298)</h3><button class="btn download-detail-btn" onclick="downloadDetail('恢复出价')">下载此明细</button><div class="detail-table-container"><table class="detail-table" id="detail-恢复出价"><thead><tr><th>恢复月份</th><th>处理人</th><th>恢复车商数</th></tr></thead><tbody><tr><td>2026-08</td><td>付新阳</td><td>13</td></tr><tr><td>2026-08</td><td>姜浩</td><td>4</td></tr><tr><td>2026-08</td><td>石珊珊</td><td>29</td></tr><tr><td>2026-08</td><td>谢双双</td><td>3</td></tr><tr><td>2026-08</td><td>郑文莉</td><td>28</td></tr><tr><td>2026-08</td><td>于建业</td><td>16</td></tr><tr><td>2026-08</td><td>冯泽岗</td><td>17</td></tr><tr><td>2026-08</td><td>林天</td><td>2</td></tr><tr><td>2026-08</td><td>陈树在</td><td>37</td></tr><tr><td>2026-08</td><td>史文轩</td><td>12</td></tr><tr><td>2026-08</td><td>张天恩</td><td>43</td></tr><tr><td>2026-08</td><td>杨兴红</td><td>4</td></tr><tr><td>2026-08</td><td>谷建营</td><td>17</td></tr><tr><td>2026-08</td><td>侯浩浩</td><td>2</td></tr><tr><td>2026-08</td><td>张晓飞</td><td>1</td></tr><tr><td>2026-08</td><td>刘丹丹</td><td>4</td></tr><tr><td>2026-08</td><td>孙晓亚</td><td>3</td></tr><tr><td>2026-08</td><td>张晓文</td><td>26</td></tr><tr><td>2026-08</td><td>张秀康</td><td>2</td></tr><tr><td>2026-08</td><td>郑燕玲</td><td>1</td></tr><tr><td>2026-08</td><td>陈娟</td><td>3</td></tr><tr><td>2026-08</td><td>刘连</td><td>2</td></tr><tr><td>2026-08</td><td>于烨</td><td>15</td></tr><tr><td>2026-08</td><td>柳长友</td><td>10</td></tr><tr><td>2026-08</td><td>骆垚鑫</td><td>5</td></tr><tr><td>2026-08</td><td>梁叶凤</td><td>1</td></tr></tbody></table></div></div><div class="detail-section"><h3>4. 激活充保 (18条记录，激活充保人数：39)</h3><button class="btn download-detail-btn" onclick="downloadDetail('激活充保')">下载此明细</button><div class="detail-table-container"><table class="detail-table" id="detail-激活充保"><thead><tr><th>转化时间</th><th>处理人</th><th>激活充保人数</th></tr></thead><tbody><tr><td>2026-08</td><td>付新阳</td><td>1</td></tr><tr><td>2026-08</td><td>石珊珊</td><td>2</td></tr><tr><td>2026-08</td><td>谢双双</td><td>1</td></tr><tr><td>2026-08</td><td>郑文莉</td><td>4</td></tr><tr><td>2026-08</td><td>于建业</td><td>4</td></tr><tr><td>2026-08</td><td>冯泽岗</td><td>1</td></tr><tr><td>2026-08</td><td>娄鹏程</td><td>1</td></tr><tr><td>2026-08</td><td>陈树在</td><td>3</td></tr><tr><td>2026-08</td><td>张天恩</td><td>7</td></tr><tr><td>2026-08</td><td>杨兴红</td><td>2</td></tr><tr><td>2026-08</td><td>谷建营</td><td>1</td></tr><tr><td>2026-08</td><td>马迎国</td><td>1</td></tr><tr><td>2026-08</td><td>刘丹丹</td><td>1</td></tr><tr><td>2026-08</td><td>孙晓亚</td><td>2</td></tr><tr><td>2026-08</td><td>张晓文</td><td>3</td></tr><tr><td>2026-08</td><td>陈娟</td><td>4</td></tr><tr><td>2026-08</td><td>于烨</td><td>1</td></tr><tr><td>2026-08</td><td>梁叶凤</td><td>1</td></tr></tbody></table></div></div><div class="detail-section"><h3>5. 激活充保出价 (25条记录，激活充保/出价车商数：572)</h3><button class="btn download-detail-btn" onclick="downloadDetail('激活充保出价')">下载此明细</button><div class="detail-table-container"><table class="detail-table" id="detail-激活充保出价"><thead><tr><th>月份</th><th>工单处理人</th><th>激活充保/出价车商数</th></tr></thead><tbody><tr><td>2026-08</td><td>侯浩浩</td><td>4</td></tr><tr><td>2026-08</td><td>谷建营</td><td>25</td></tr><tr><td>2026-08</td><td>付新阳</td><td>58</td></tr><tr><td>2026-08</td><td>张晓飞</td><td>3</td></tr><tr><td>2026-08</td><td>林天</td><td>9</td></tr><tr><td>2026-08</td><td>张晓文</td><td>56</td></tr><tr><td>2026-08</td><td>张秀康</td><td>5</td></tr><tr><td>2026-08</td><td>杨兴红</td><td>6</td></tr><tr><td>2026-08</td><td>郑文莉</td><td>42</td></tr><tr><td>2026-08</td><td>陈树在</td><td>33</td></tr><tr><td>2026-08</td><td>马迎国</td><td>2</td></tr><tr><td>2026-08</td><td>冯泽岗</td><td>43</td></tr><tr><td>2026-08</td><td>石珊珊</td><td>57</td></tr><tr><td>2026-08</td><td>姜浩</td><td>6</td></tr><tr><td>2026-08</td><td>于建业</td><td>21</td></tr><tr><td>2026-08</td><td>郑燕玲</td><td>1</td></tr><tr><td>2026-08</td><td>陈娟</td><td>17</td></tr><tr><td>2026-08</td><td>于烨</td><td>43</td></tr><tr><td>2026-08</td><td>史文轩</td><td>9</td></tr><tr><td>2026-08</td><td>孙晓亚</td><td>8</td></tr><tr><td>2026-08</td><td>柳长友</td><td>19</td></tr><tr><td>2026-08</td><td>刘丹丹</td><td>7</td></tr><tr><td>2026-08</td><td>张天恩</td><td>82</td></tr><tr><td>2026-08</td><td>梁叶凤</td><td>5</td></tr><tr><td>2026-08</td><td>骆垚鑫</td><td>11</td></tr></tbody></table></div></div><div class="detail-section"><h3>6. 跨域二提 (16条记录，2提车商数：46)</h3><button class="btn download-detail-btn" onclick="downloadDetail('跨域二提')">下载此明细</button><div class="detail-table-container"><table class="detail-table" id="detail-跨域二提"><thead><tr><th>分类</th><th>月份</th><th>2提当天维护人姓名</th><th>2提成交量</th></tr></thead><tbody><tr><td>跨域2提</td><td>2026-08</td><td>于建业</td><td>1</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>于烨</td><td>1</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>侯浩浩</td><td>1</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>冯泽岗</td><td>1</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>刘丹丹</td><td>8</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>刘连</td><td>1</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>张天恩</td><td>1</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>张晓文</td><td>1</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>张秀康</td><td>1</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>杨兴红</td><td>5</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>石珊珊</td><td>1</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>谢双双</td><td>4</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>郑文莉</td><td>6</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>郑燕玲</td><td>1</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>陈娟</td><td>12</td></tr><tr><td>跨域2提</td><td>2026-08</td><td>陈树在</td><td>1</td></tr></tbody></table></div></div><div class="detail-section"><h3>7. 跨域首提 (15条记录，首提车商数：81)</h3><button class="btn download-detail-btn" onclick="downloadDetail('跨域首提')">下载此明细</button><div class="detail-table-container"><table class="detail-table" id="detail-跨域首提"><thead><tr><th>分类</th><th>月份</th><th>维护人编号</th><th>维护人姓名</th><th>车商数</th></tr></thead><tbody><tr><td>跨域首提</td><td>2026-08</td><td>OwOcygc8sc</td><td>刘丹丹</td><td>21</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>QkQ5AtkCdJ</td><td>刘瑶</td><td>1</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>3ZuCZiPKCk</td><td>姜浩</td><td>2</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>5872206</td><td>郑燕玲</td><td>1</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>KSuyFveiqt</td><td>谢双双</td><td>9</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>VRqa2ePSt6</td><td>陈娟</td><td>18</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>TLgVuiGFyt</td><td>于建业</td><td>2</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>lJu2jcCme4</td><td>郑文莉</td><td>4</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>JAOUouYAPd</td><td>林天</td><td>5</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>mkc3OG5AIp</td><td>张秀康</td><td>1</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>2YOMikbtQJ</td><td>史文轩</td><td>2</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>QCualwzeAr</td><td>杨兴红</td><td>9</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>YYQLTvm3YV</td><td>张晓飞</td><td>1</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>xkaSiLzMgB</td><td>侯浩浩</td><td>2</td></tr><tr><td>跨域首提</td><td>2026-08</td><td>t3Ky6nZz63</td><td>于烨</td><td>3</td></tr></tbody></table></div></div><div class="detail-section"><h3>8. 邀约注册车商数 (94条记录)</h3><button class="btn download-detail-btn" onclick="downloadDetail('邀约注册车商数')">下载此明细</button><div class="detail-table-container"><table class="detail-table" id="detail-邀约注册车商数"><thead><tr><th>车商编号</th><th>邀约人姓名</th><th>邀约人工号</th><th>注册时间</th><th>注册渠道</th><th>注册月份</th></tr></thead><tbody><tr><td>MJBLIA02608010001</td><td>何展全</td><td></td><td>2026-08-01 10:57:48</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJCEYO02608110001</td><td>史文轩</td><td>DSC003306</td><td>2026-08-11 11:01:05</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJJJBF02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 11:29:31</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJNVEI02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 14:36:28</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJRVIE02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 10:39:18</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJTCDP02608210001</td><td>姜浩</td><td>DSC003645</td><td>2026-08-21 13:09:47</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJWDBV02608310001</td><td>林天</td><td>DSC003565</td><td>2026-08-31 09:07:33</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJWLPV02608240001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-24 12:13:52</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJXKCT02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 13:32:38</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJHCMZ02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 11:50:30</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJIPSC02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 13:13:41</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJPZAI02608110001</td><td>张晓飞</td><td>DSC010720</td><td>2026-08-11 10:40:35</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJXTXU02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 11:46:15</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJYKJE02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 09:29:58</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJYVZH02608180001</td><td>张晓飞</td><td>DSC010720</td><td>2026-08-18 11:40:43</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJAQTD02608050001</td><td>姜浩</td><td>DSC003645</td><td>2026-08-05 15:54:35</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJEWHX02608150001</td><td>张晓飞</td><td>DSC010720</td><td>2026-08-15 11:33:20</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJIVIM02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 10:37:24</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJUYAF02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 10:05:33</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJZRPA02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 11:54:31</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJAKTT02608090001</td><td>张治</td><td></td><td>2026-08-09 11:36:44</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJDDPG02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 13:44:23</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJDITK02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 09:30:24</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJDZBF02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 13:13:32</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJHQNO02608140001</td><td>石龙飞</td><td>DSC009390</td><td>2026-08-14 15:06:38</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJHUIX02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 10:38:05</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJIWUX02608140001</td><td>张晓飞</td><td>DSC010720</td><td>2026-08-14 15:55:26</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJKYXU02608060001</td><td>林天</td><td>DSC003565</td><td>2026-08-06 16:55:18</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJNIFW02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 11:49:52</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJSRPD02608030001</td><td>贾信刚</td><td></td><td>2026-08-03 07:25:57</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJDRBK02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 12:28:19</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJGVMW02608190001</td><td>姜浩</td><td>DSC003645</td><td>2026-08-19 12:58:02</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJHFZG02608230001</td><td>侯浩浩</td><td>DSC013575</td><td>2026-08-23 16:00:11</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJHYIN02608170001</td><td>谷建营</td><td>DSC003425</td><td>2026-08-17 16:47:16</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJMXGR02608070001</td><td>张明科</td><td>DSC010329</td><td>2026-08-07 15:50:11</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJNONI02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 12:06:41</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJNWMS02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 12:48:21</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJOGCC02608120001</td><td>张晓飞</td><td>DSC010720</td><td>2026-08-12 11:04:59</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJOOAN02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 10:37:14</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJTDBD02608070001</td><td>凌裕丰</td><td></td><td>2026-08-07 11:17:54</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJTRHY02608310001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-31 13:23:02</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJDILI02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 10:37:52</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJHDRF02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 12:22:48</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJHSWM02608130001</td><td>冯泽岗</td><td>DSC003903</td><td>2026-08-13 13:36:29</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJMNIO02608110001</td><td>张晓飞</td><td>DSC010720</td><td>2026-08-11 16:34:46</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJNWDT02608130001</td><td>张晓飞</td><td>DSC010720</td><td>2026-08-13 10:55:01</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJRUYQ02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 09:30:46</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJUFMU02608040001</td><td>张纪伟</td><td>DSCW004280</td><td>2026-08-04 15:21:23</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJUWUS02608020001</td><td>李小军</td><td></td><td>2026-08-02 11:28:23</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJWKTM02608200001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-20 09:45:28</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJXGBE02608120001</td><td>张晓飞</td><td>DSC010720</td><td>2026-08-12 12:12:51</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJYYRY02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 11:27:12</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJALXS02608060001</td><td>王晨</td><td>DSC013476</td><td>2026-08-06 19:56:44</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJJTGN02608310001</td><td>王世普</td><td></td><td>2026-08-31 08:59:20</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJOJLB02608270001</td><td>林天</td><td>DSC003565</td><td>2026-08-27 17:15:43</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJRPEX02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 11:32:15</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJTXAK02608050001</td><td>姜浩</td><td>DSC003645</td><td>2026-08-05 15:50:28</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJYXRB02608140001</td><td>张晓飞</td><td>DSC010720</td><td>2026-08-14 19:50:07</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJGKNT02608050001</td><td>姜浩</td><td>DSC003645</td><td>2026-08-05 15:51:46</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJIHBB02608100001</td><td>林天</td><td>DSC003565</td><td>2026-08-10 10:27:07</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJITBA02608170001</td><td>姜浩</td><td>DSC003645</td><td>2026-08-17 17:46:04</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJRDTZ02608110001</td><td>王晨</td><td>DSC013476</td><td>2026-08-11 14:10:19</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJTDQL02608030001</td><td>魏东焱</td><td></td><td>2026-08-03 17:31:16</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJUPWW02608010001</td><td>15560940307</td><td></td><td>2026-08-01 12:39:15</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJVRJN02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 09:42:09</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJXCGN02608100001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-10 15:52:59</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJZWKR02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 12:29:45</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJABIE02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 12:18:31</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJFFCQ02608080001</td><td>于建业</td><td>DSC010496</td><td>2026-08-08 13:24:06</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJFNWM02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 14:09:37</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJNDKJ02608020001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-02 11:30:41</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJOVNJ02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 10:47:08</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJPHWZ02608060001</td><td>石龙飞</td><td>DSC009390</td><td>2026-08-06 10:03:37</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJRTEP02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 12:31:59</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJSHAN02608290001</td><td>石龙飞</td><td>DSC009390</td><td>2026-08-29 13:21:02</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJSXCT02608140001</td><td>张晓飞</td><td>DSC010720</td><td>2026-08-14 11:40:18</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJXQKH02608240001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-24 13:20:04</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJCBLW02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 14:15:47</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJCHBC02608010001</td><td>侯浩浩</td><td>DSC013575</td><td>2026-08-01 10:45:08</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJFXSN02608110001</td><td>冯泽岗</td><td>DSC003903</td><td>2026-08-11 08:20:08</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJORGL02608290001</td><td>韩鹏</td><td></td><td>2026-08-29 22:12:25</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJSIBU02608270001</td><td>张建飞</td><td></td><td>2026-08-27 11:02:56</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJUWJX02608140001</td><td>王广峰</td><td></td><td>2026-08-14 19:42:09</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJZCFM02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 10:51:02</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJGFEV02608280001</td><td>曹峰</td><td>DSC000173</td><td>2026-08-28 14:33:13</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJMEWT02608100001</td><td>王同琪</td><td>DSC000910</td><td>2026-08-10 23:38:39</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJSJTD02608130001</td><td>郑燕玲</td><td>DSC014389</td><td>2026-08-13 09:21:26</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJUJAJ02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 10:44:16</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJCMVV02608170001</td><td>谷建营</td><td>DSC003425</td><td>2026-08-17 16:35:24</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJMPOL02608170001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-17 10:13:20</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJNDZJ02608120001</td><td>赵金川</td><td>DSC012590</td><td>2026-08-12 11:13:34</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJQSGT02608230001</td><td>刘丹丹</td><td>DSC013941</td><td>2026-08-23 07:27:14</td><td>carsource_share_invite_wexin</td><td>carsource_share_invite_wexin</td></tr><tr><td>MJTNLP02608070001</td><td>侯浩浩</td><td>DSC013575</td><td>2026-08-07 14:26:25</td><td>crm-invite</td><td>crm-invite</td></tr><tr><td>MJZSHC02608240001</td><td>娄鹏程</td><td>DSC012416</td><td>2026-08-24 11:34:51</td><td>crm-invite</td><td>crm-invite</td></tr></tbody></table></div></div><div class="detail-section"><h3>9. 跨域成交车商数-按维护人 (27条记录，跨域成交车商数：849)</h3><button class="btn download-detail-btn" onclick="downloadDetail('跨域成交车商数-按维护人')">下载此明细</button><div class="detail-table-container"><table class="detail-table" id="detail-跨域成交车商数-按维护人"><thead><tr><th>月份</th><th>大区</th><th>维护人工号</th><th>维护人姓名</th><th>跨域成交车商数</th></tr></thead><tbody><tr><td>2026-08</td><td></td><td>QkQ5AtkCdJ</td><td>刘瑶</td><td>3</td></tr><tr><td>2026-08</td><td>客户运营部</td><td>SNcB3tz7FP</td><td>张晓文</td><td>80</td></tr><tr><td>2026-08</td><td>新买家运营部</td><td>QCualwzeAr</td><td>杨兴红</td><td>13</td></tr><tr><td>2026-08</td><td>运营四区</td><td>5872206</td><td>郑燕玲</td><td>6</td></tr><tr><td>2026-08</td><td>运营四区</td><td>JAOUouYAPd</td><td>林天</td><td>32</td></tr><tr><td>2026-08</td><td>现场运营部</td><td>t3Ky6nZz63</td><td>于烨</td><td>33</td></tr><tr><td>2026-08</td><td>运营四区</td><td>TLgVuiGFyt</td><td>于建业</td><td>42</td></tr><tr><td>2026-08</td><td>客户运营部</td><td>prQlGOr7Rn</td><td>张天恩</td><td>129</td></tr><tr><td>2026-08</td><td>新买家运营部</td><td>KSuyFveiqt</td><td>谢双双</td><td>11</td></tr><tr><td>2026-08</td><td>现场运营部</td><td>2zABguPnlf</td><td>冯泽岗</td><td>38</td></tr><tr><td>2026-08</td><td>现场运营部</td><td>JcuoSVBjZf</td><td>付新阳</td><td>30</td></tr><tr><td>2026-08</td><td>运营三区</td><td>3ZuCZiPKCk</td><td>姜浩</td><td>21</td></tr><tr><td>2026-08</td><td>运营三区</td><td>xkaSiLzMgB</td><td>侯浩浩</td><td>6</td></tr><tr><td>2026-08</td><td>运营三区</td><td>AuqO282Vnt</td><td>娄鹏程</td><td>2</td></tr><tr><td>2026-08</td><td>运营三区</td><td>mkc3OG5AIp</td><td>张秀康</td><td>5</td></tr><tr><td>2026-08</td><td>运营四区</td><td>Eb8UUviBDR</td><td>柳长友</td><td>28</td></tr><tr><td>2026-08</td><td>客户运营部</td><td>j1OkeyOiY4</td><td>石珊珊</td><td>79</td></tr><tr><td>2026-08</td><td>客户运营部</td><td>lTOyroIiD5</td><td>陈树在</td><td>67</td></tr><tr><td>2026-08</td><td>新买家运营部</td><td>OwOcygc8sc</td><td>刘丹丹</td><td>21</td></tr><tr><td>2026-08</td><td>新买家运营部</td><td>lJu2jcCme4</td><td>郑文莉</td><td>74</td></tr><tr><td>2026-08</td><td>新买家运营部</td><td>VRqa2ePSt6</td><td>陈娟</td><td>25</td></tr><tr><td>2026-08</td><td>运营一区</td><td>2YOMikbtQJ</td><td>史文轩</td><td>34</td></tr><tr><td>2026-08</td><td>运营一区</td><td>C88UME6FZt</td><td>谷建营</td><td>33</td></tr><tr><td>2026-08</td><td>运营三区</td><td>tYacH2jgma</td><td>王晨</td><td>1</td></tr><tr><td>2026-08</td><td>运营二区</td><td>5JecSWnxkq</td><td>骆垚鑫</td><td>9</td></tr><tr><td>2026-08</td><td>运营二区</td><td>FheWx3MZdc</td><td>刘连</td><td>15</td></tr><tr><td>2026-08</td><td>运营四区</td><td>YYQLTvm3YV</td><td>张晓飞</td><td>12</td></tr></tbody></table></div></div><div class="detail-section"><h3>10. 跨域出价车商数-按维护人 (27条记录，跨域出价车商数：2621)</h3><button class="btn download-detail-btn" onclick="downloadDetail('跨域出价车商数-按维护人')">下载此明细</button><div class="detail-table-container"><table class="detail-table" id="detail-跨域出价车商数-按维护人"><thead><tr><th>月份</th><th>大区</th><th>维护人工号</th><th>维护人姓名</th><th>跨域出价车商数</th></tr></thead><tbody><tr><td>2026-08</td><td></td><td>QkQ5AtkCdJ</td><td>刘瑶</td><td>20</td></tr><tr><td>2026-08</td><td>客户运营部</td><td>SNcB3tz7FP</td><td>张晓文</td><td>262</td></tr><tr><td>2026-08</td><td>新买家运营部</td><td>QCualwzeAr</td><td>杨兴红</td><td>91</td></tr><tr><td>2026-08</td><td>运营四区</td><td>5872206</td><td>郑燕玲</td><td>19</td></tr><tr><td>2026-08</td><td>运营四区</td><td>JAOUouYAPd</td><td>林天</td><td>58</td></tr><tr><td>2026-08</td><td>现场运营部</td><td>t3Ky6nZz63</td><td>于烨</td><td>78</td></tr><tr><td>2026-08</td><td>运营四区</td><td>TLgVuiGFyt</td><td>于建业</td><td>89</td></tr><tr><td>2026-08</td><td>客户运营部</td><td>prQlGOr7Rn</td><td>张天恩</td><td>357</td></tr><tr><td>2026-08</td><td>新买家运营部</td><td>KSuyFveiqt</td><td>谢双双</td><td>70</td></tr><tr><td>2026-08</td><td>现场运营部</td><td>2zABguPnlf</td><td>冯泽岗</td><td>112</td></tr><tr><td>2026-08</td><td>现场运营部</td><td>JcuoSVBjZf</td><td>付新阳</td><td>87</td></tr><tr><td>2026-08</td><td>运营三区</td><td>3ZuCZiPKCk</td><td>姜浩</td><td>47</td></tr><tr><td>2026-08</td><td>运营三区</td><td>xkaSiLzMgB</td><td>侯浩浩</td><td>20</td></tr><tr><td>2026-08</td><td>运营三区</td><td>AuqO282Vnt</td><td>娄鹏程</td><td>4</td></tr><tr><td>2026-08</td><td>运营三区</td><td>mkc3OG5AIp</td><td>张秀康</td><td>13</td></tr><tr><td>2026-08</td><td>运营四区</td><td>Eb8UUviBDR</td><td>柳长友</td><td>62</td></tr><tr><td>2026-08</td><td>客户运营部</td><td>j1OkeyOiY4</td><td>石珊珊</td><td>219</td></tr><tr><td>2026-08</td><td>客户运营部</td><td>lTOyroIiD5</td><td>陈树在</td><td>242</td></tr><tr><td>2026-08</td><td>新买家运营部</td><td>OwOcygc8sc</td><td>刘丹丹</td><td>98</td></tr><tr><td>2026-08</td><td>新买家运营部</td><td>lJu2jcCme4</td><td>郑文莉</td><td>283</td></tr><tr><td>2026-08</td><td>新买家运营部</td><td>VRqa2ePSt6</td><td>陈娟</td><td>131</td></tr><tr><td>2026-08</td><td>运营一区</td><td>2YOMikbtQJ</td><td>史文轩</td><td>70</td></tr><tr><td>2026-08</td><td>运营一区</td><td>C88UME6FZt</td><td>谷建营</td><td>80</td></tr><tr><td>2026-08</td><td>运营三区</td><td>tYacH2jgma</td><td>王晨</td><td>1</td></tr><tr><td>2026-08</td><td>运营二区</td><td>5JecSWnxkq</td><td>骆垚鑫</td><td>33</td></tr><tr><td>2026-08</td><td>运营二区</td><td>FheWx3MZdc</td><td>刘连</td><td>54</td></tr><tr><td>2026-08</td><td>运营四区</td><td>YYQLTvm3YV</td><td>张晓飞</td><td>21</td></tr></tbody></table></div></div>
+</div>
+
+<script>
+function toggleValidation() {
+    const panel = document.getElementById('validation-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    if (tabName === 'summary') {
+        document.querySelector('.tab-btn:first-child').classList.add('active');
+        document.getElementById('tab-summary').classList.add('active');
+    } else {
+        document.querySelector('.tab-btn:last-child').classList.add('active');
+        document.getElementById('tab-detail').classList.add('active');
+    }
+}
+
+
+async function downloadExcel() {
+    try {
+        await Analytics.trackDownload('Excel汇总文件');
+    } catch (e) {
+        console.error('统计记录失败:', e);
+    }
+    const base64 = "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";
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = '小组制指标库_2026年.xlsx';
+    link.click();
+}
+
+// 统计配置 - jsonbin.io
+let JSONBIN_KEY = '';
+let JSONBIN_ID = '';
+
+const Analytics = {
+    SOURCE: 'hermes',  // 版本来源：opencode 或 hermes
+    
+    async loadConfig() {
+        if (JSONBIN_KEY) return true;
+        try {
+            const res = await fetch('config.json');
+            const config = await res.json();
+            JSONBIN_KEY = config.jsonbin_key;
+            JSONBIN_ID = config.jsonbin_id || '';
+            return true;
+        } catch (e) {
+            console.error('加载配置失败:', e);
+            return false;
+        }
+    },
+    
+    async loadData() {
+        await this.loadConfig();
+        if (!JSONBIN_KEY) return {users: {}, downloads: {}};
+        if (!JSONBIN_ID) return {users: {}, downloads: {}};
+        try {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_ID}/latest`, {
+                headers: {'X-Master-Key': JSONBIN_KEY}
+            });
+            const data = await res.json();
+            return data.record || {users: {}, downloads: {}};
+        } catch (e) {
+            console.error('加载数据失败:', e);
+            return {users: {}, downloads: {}};
+        }
+    },
+    
+    async saveData(data) {
+        await this.loadConfig();
+        if (!JSONBIN_KEY) return;
+        try {
+            if (JSONBIN_ID) {
+                await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'X-Master-Key': JSONBIN_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+            } else {
+                const res = await fetch('https://api.jsonbin.io/v3/b', {
+                    method: 'POST',
+                    headers: {
+                        'X-Master-Key': JSONBIN_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                console.log('创建成功:', result.id);
+            }
+        } catch (e) {
+            console.error('保存失败:', e);
+        }
+    },
+    
+    getUserId() {
+        let userId = localStorage.getItem('dashboard_user_id');
+        if (!userId) {
+            userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('dashboard_user_id', userId);
+        }
+        return userId;
+    },
+    
+    async trackDownload(fileName) {
+        const data = await this.loadData();
+        const userId = this.getUserId();
+        const source = this.SOURCE;
+        
+        if (!data.downloads[fileName]) {
+            data.downloads[fileName] = {count: 0, users: [], bySource: {}};
+        }
+        data.downloads[fileName].count++;
+        
+        // 按来源统计
+        if (!data.downloads[fileName].bySource[source]) {
+            data.downloads[fileName].bySource[source] = {count: 0, users: []};
+        }
+        data.downloads[fileName].bySource[source].count++;
+        
+        if (!data.users[userId]) {
+            data.users[userId] = {
+                firstVisit: new Date().toISOString(),
+                downloads: [],
+                source: source
+            };
+        }
+        data.users[userId].downloads.push({
+            file: fileName,
+            time: new Date().toISOString(),
+            source: source
+        });
+        
+        await this.saveData(data);
+    },
+    
+    async getStats() {
+        const data = await this.loadData();
+        const source = this.SOURCE;
+        
+        // 统计各来源的用户数
+        let usersBySource = {};
+        for (const [userId, userInfo] of Object.entries(data.users || {})) {
+            const s = userInfo.source || 'unknown';
+            if (!usersBySource[s]) usersBySource[s] = 0;
+            usersBySource[s]++;
+        }
+        
+        // 统计各来源的下载次数
+        let downloadsBySource = {};
+        for (const [fileName, fileInfo] of Object.entries(data.downloads || {})) {
+            for (const [s, sInfo] of Object.entries(fileInfo.bySource || {})) {
+                if (!downloadsBySource[s]) downloadsBySource[s] = {count: 0, files: {}};
+                downloadsBySource[s].count += sInfo.count;
+                downloadsBySource[s].files[fileName] = sInfo.count;
+            }
+        }
+        
+        return {
+            totalUsers: Object.keys(data.users || {}).length,
+            totalDownloads: Object.values(data.downloads || {}).reduce((sum, d) => sum + (d.count || 0), 0),
+            downloadsByFile: data.downloads || {},
+            usersBySource: usersBySource,
+            downloadsBySource: downloadsBySource,
+            currentSource: source
+        };
+    },
+    
+    exportStats() {
+        this.getStats().then(stats => {
+            const exportData = {
+                ...stats,
+                exportTime: new Date().toISOString(),
+                exportSource: this.SOURCE
+            };
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '使用统计_' + this.SOURCE + '_' + new Date().toISOString().split('T')[0] + '.json';
+            link.click();
+        });
+    }
+};
+
+async function downloadDetail(name) {
+    try {
+        await Analytics.trackDownload(name + '_明细数据');
+    } catch (e) {
+        console.error('统计记录失败:', e);
+    }
+    
+    const table = document.getElementById('detail-' + name);
+    if (!table) return;
+    
+    let csv = [];
+    const rows = table.querySelectorAll('tr');
+    
+    rows.forEach(row => {
+        const cols = row.querySelectorAll('td, th');
+        const rowData = [];
+        cols.forEach(col => {
+            let text = col.innerText.replace(/"/g, '""');
+            rowData.push('"' + text + '"');
+        });
+        csv.push(rowData.join(','));
+    });
+    
+    const csvContent = csv.join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = name + '_明细数据.csv';
+    link.click();
+}
+
+async function showAnalytics() {
+    const stats = await Analytics.getStats();
+    let msg = '使用统计 (当前版本: ' + stats.currentSource + ')
+
+';
+    msg += '访问用户数: ' + stats.totalUsers + '
+';
+    msg += '总下载次数: ' + stats.totalDownloads + '
+
+';
+    
+    // 按来源统计
+    msg += '按来源统计:
+';
+    for (const [source, info] of Object.entries(stats.downloadsBySource || {})) {
+        msg += '  [' + source + '] 下载: ' + info.count + '次
+';
+        for (const [file, count] of Object.entries(info.files || {})) {
+            msg += '    - ' + file + ': ' + count + '次
+';
+        }
+    }
+    
+    msg += '
+下载明细(全部):
+';
+    for (const [file, info] of Object.entries(stats.downloadsByFile)) {
+        msg += '  ' + file + ': ' + info.count + '次
+';
+    }
+    msg += '
+注意: 请用 http://localhost:8080 打开页面';
+    alert(msg);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tbody = document.querySelector('#tab-summary tbody');
+    const rows = tbody.querySelectorAll('tr');
+    
+    const emptyRows = [];
+    rows.forEach(row => {
+        if (row.getAttribute('data-has-data') === 'false') {
+            emptyRows.push(row);
+        }
+    });
+    
+    if (emptyRows.length > 0) {
+        const foldBtn = document.createElement('button');
+        foldBtn.className = 'btn fold-btn';
+        foldBtn.innerText = '展开无数据指标 (' + emptyRows.length + '项)';
+        foldBtn.onclick = function() {
+            const isHidden = emptyRows[0].style.display === 'none';
+            emptyRows.forEach(row => {
+                row.style.display = isHidden ? '' : 'none';
+            });
+            foldBtn.innerText = isHidden ? '收起无数据指标' : '展开无数据指标 (' + emptyRows.length + '项)';
+        };
+        
+        const tableContainer = document.querySelector('#tab-summary .table-container');
+        tableContainer.insertBefore(foldBtn, tableContainer.firstChild);
+        
+        emptyRows.forEach(row => {
+            row.style.display = 'none';
+        });
+        foldBtn.innerText = '展开无数据指标 (' + emptyRows.length + '项)';
+    }
+});
+</script>
+</body>
+</html>
